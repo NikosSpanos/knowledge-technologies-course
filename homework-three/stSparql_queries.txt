@@ -1,0 +1,372 @@
+All prefixes used for the queries:
+
+PREFIX lgd:<http://linkedgeodata.org/triplify/>
+PREFIX lgdgeo:<http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX lgdont:<http://linkedgeodata.org/ontology/>
+PREFIX geonames:<http://www.geonames.org/ontology#>
+PREFIX clc: <http://geo.linkedopendata.gr/corine/ontology#>
+PREFIX gag: <http://geo.linkedopendata.gr/greekadministrativeregion/ontology#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX geor: <http://www.opengis.net/def/rule/geosparql/>
+PREFIX strdf: <http://strdf.di.uoa.gr/ontology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>
+PREFIX osm: <https://ai.di.uoa.gr/ontology/osm#>
+PREFIX ai:<https://ai.di.uoa.gr/ontology#>
+
+------------------------------------------------------------
+
+Exercise 1
+------------------------------------------------------------
+(a) Find name and geometries of the administrative units having United Kingdom as an upper level unit.
+
+SELECT ?admName ?admCountry ?div ?polygon
+WHERE{
+
+    ?s ai:hasNAME_2 ?admName .
+    ?s ai:hasNAME_1 ?admCountry .
+    ?s ai:hasTYPE_2 ?div .
+    ?s ai:hasCOUNTRY "United Kingdom"^^xsd:string .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+}
+LIMIT 10
+
+------------------------------------------------------------
+(b) Find geometries and names of all the administrative counties of England.
+
+SELECT ?admName ?type ?polygon
+WHERE
+{
+    ?s ai:hasNAME_2 ?admName .
+    ?s ai:hasNAME_1 "England"^^xsd:string .
+    ?s ai:hasTYPE_2 ?type .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+    FILTER( REGEX(str(?type), "Administrative County"^^xsd:string) )
+}
+LIMIT 30
+
+------------------------------------------------------------
+(c) Find names of all the administrative units that are neighbours of Southampton.
+
+SELECT ?sourceName ?targetName ?type
+WHERE
+{
+    ?s1 ai:hasNAME_3 ?sourceName .
+    ?s1 geo:hasGeometry [ geo:asWKT ?polygon1 ] .
+
+    ?s2 ai:hasNAME_3 ?targetName .
+    ?s2 ai:hasTYPE_3 ?type .
+    ?s2 geo:hasGeometry [ geo:asWKT ?polygon2 ] .
+
+    FILTER(str(?sourceName ) = "Southampton" && str(?targetName) != "Southampton" )
+    FILTER( geof:sfIntersects(?polygon1, ?polygon2) )
+}
+
+------------------------------------------------------------
+(d) Compute the total area of all counties of Ireland.
+
+SELECT (SUM(strdf:area(?polygon)) AS ?myarea)
+WHERE
+{
+    ?s ai:hasCOUNTRY "Ireland"^^xsd:string .
+    ?s ai:hasTYPE_1 "County"^^xsd:string .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+}
+
+------------------------------------------------------------
+(e) Compute the minimum bounding box of the geometry of Ireland.
+
+#option 1 | using the strdf:extent command
+
+SELECT (strdf:extent(?polygon) AS ?minbbox)
+WHERE
+{
+    ?s ai:hasCOUNTRY "Ireland"^^xsd:string .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+}
+
+#option 2 | using the strdf:envelope command
+
+SELECT (strdf:envelope(?polygon) AS ?minbbox)
+WHERE
+{
+    ?s ai:hasCOUNTRY "Ireland"^^xsd:string .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+} ORDER BY ASC(?minbbox) LIMIT 1
+
+------------------------------------------------------------
+(f) Find administrative units that are on the border of England.
+
+SELECT *
+WHERE
+{
+    {
+        SELECT ?sourceName ?targetName ?type (strdf:touches(strdf:boundary(?polygon1), ?polygon2) as ?inBoundary)
+        WHERE
+        {
+            ?s1 ai:hasNAME_1 "England"^^xsd:string .
+            ?s1 geo:hasGeometry [ geo:asWKT ?polygon1 ] .
+
+            ?s2 ai:hasNAME_3 ?targetName .
+            ?s2 ai:hasTYPE_3 ?type .
+            ?s2 geo:hasGeometry [ geo:asWKT ?polygon2 ] .
+        }
+    }
+    FILTER(?inBoundary = "true"^^xsd:boolean)
+}
+
+------------------------------------------------------------
+
+Exercise 2
+------------------------------------------------------------
+(a) Find all hotels and show them on the map.
+
+SELECT ?hotelName ?type ?polygon
+WHERE
+{
+    ?s osm:hasFclass "hotel"^^xsd:string .
+    ?s osm:hasName ?hotelName .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+} LIMIT 5
+
+------------------------------------------------------------
+(b) Find the longest five rivers and show them on a map.
+
+SELECT ?riverName ?type (SUM(strdf:area(?polygon)) as ?riverArea) ?polygon
+WHERE
+{
+    ?s osm:hasFclass ?type .
+    ?s osm:hasName ?riverName .
+    ?s geo:hasGeometry [ geo:asWKT ?polygon ] .
+    FILTER( (str(?type) = "riverbank"^^xsd:string) )
+} GROUP BY ?riverName ?type ?polygon ORDER BY DESC(?riverArea) LIMIT 5
+
+------------------------------------------------------------
+(c) Find all hospitals that are within 3 kilometers of a hotel.
+
+SELECT ?hospitalName ?type1 ?hotelName ?type2 ?polygon1 ?polygon2
+WHERE
+{
+    ?s1 osm:hasFclass ?type1;
+        osm:hasName ?hospitalName .
+    ?s2 osm:hasFclass ?type2;
+        osm:hasName ?hotelName .
+    ?s1 geo:hasGeometry [ geo:asWKT ?polygon1 ] .
+    ?s2 geo:hasGeometry [ geo:asWKT ?polygon2 ] .
+    FILTER( (str(?type1) = "hospital"^^xsd:string) && (str(?type2) = "hotel"^^xsd:string) )
+    FILTER( strdf:distance(?polygon1, ?polygon2, uom:metre) < 3000)
+} LIMIT 5
+
+------------------------------------------------------------
+(d) Find all the libraries that are in 2 kilometer radius of a university.
+
+
+SELECT ?univName ?libName
+WHERE
+{
+    ?s1 osm:hasFclass "university"^^xsd:string;
+        osm:hasName ?univName .
+    ?s2 osm:hasFclass "library"^^xsd:string;
+        osm:hasName ?libName .
+    ?s1 geo:hasGeometry [ geo:asWKT ?polygon1 ] .
+    ?s2 geo:hasGeometry [ geo:asWKT ?polygon2 ] .
+    FILTER( strdf:distance(?polygon1, ?polygon2, uom:metre) < 2000)
+} LIMIT 5
+
+------------------------------------------------------------
+Exercise 3
+------------------------------------------------------------
+(a) Which river crosses London?
+
+SELECT DISTINCT ?riverName
+WHERE
+{
+    ?r osm:hasFclass "riverbank"^^xsd:string;
+       osm:hasName ?riverName;
+       geo:hasGeometry [ geo:asWKT ?polygonRiver ] .
+
+    ?s ai:hasNAME_2 "Greater London"^^xsd:string;
+       geo:hasGeometry [ geo:asWKT ?polygonLondon ] .
+
+    FILTER(strdf:crosses(?polygonRiver, strdf:boundary(?polygonLondon)) )
+}
+
+------------------------------------------------------------
+(b) Find all counties of London that have a theatre.
+
+SELECT DISTINCT ?territory ?admin_names ?type (GROUP_CONCAT(?theatreName; separator=",") AS ?theatreNames)
+WHERE
+{
+    ?s ai:hasNAME_2 "Greater London"^^xsd:string;
+       ai:hasNAME_3 ?admin_names;
+       ai:hasENGTYPE_3 ?level;
+       geo:hasGeometry [ geo:asWKT ?polygonDistrict ] .
+    FILTER( str(?admin_names) != "NA" ^^xsd:string ) .
+
+    ?theatre osm:hasFclass ?type;
+             osm:hasName ?theatreName;
+             geo:hasGeometry [ geo:asWKT ?polygonTheatre ] .
+    FILTER( str(?type)="theatre"^^xsd:string ) .
+
+    FILTER( geof:sfContains( ?polygonDistrict, ?polygonTheatre) ) .
+} GROUP BY ?territory ?admin_names ?type
+LIMIT 5
+
+------------------------------------------------------------
+(c) Find all parks that have a museum inside.
+
+SELECT DISTINCT ?parkName (GROUP_CONCAT(?museumName; separator=",") AS ?museumNames)
+WHERE
+{
+    ?park osm:hasFclass ?type1;
+          osm:hasName ?parkName;
+          geo:hasGeometry [ geo:asWKT ?polygonPark ] .
+    FILTER( str(?type1)="park"^^xsd:string ) .
+
+    ?museum osm:hasFclass ?type2;
+            osm:hasName ?museumName;
+            geo:hasGeometry [ geo:asWKT ?polygonMuseum ] .
+    FILTER( str(?type2)="museum"^^xsd:string ) .
+
+    FILTER( geof:sfWithin( ?polygonMuseum, ?polygonPark) ) .
+} GROUP BY ?parkName
+LIMIT 5
+
+------------------------------------------------------------
+(d) Find all rivers in the region of Scotland that are entirely contained in a single administrative unit of Scotland.
+
+SELECT ?riverName ( COUNT(?unitName) as ?numberOfUnitsCrossed )
+WHERE
+{
+    {
+        SELECT DISTINCT ?unitName ?riverName
+        WHERE
+        {
+            ?r osm:hasName ?riverName;
+               osm:hasFclass "riverbank"^^xsd:string;
+               geo:hasGeometry [ geo:asWKT ?polygonRiver ] .
+
+            ?s ai:hasNAME_1 ?capitalName;
+               ai:hasNAME_3 ?unitName;
+               ai:hasTYPE_3 ?unitType;
+               geo:hasGeometry [ geo:asWKT ?polygonUnit ] .
+
+            FILTER( str(?capitalName)="Scotland"^^xsd:string ) .
+
+            FILTER(geof:sfWithin(?polygonRiver, ?polygonUnit) ) .
+        }
+    }
+
+} GROUP BY ?riverName
+HAVING (?numberOfUnitsCrossed = 1)
+
+------------------------------------------------------------
+(e) Find all rivers that cross at least two administrative units of England.
+
+SELECT ?riverName ( COUNT(?unitName) as ?numberOfUnitsCrossed )
+WHERE
+{
+    {
+        SELECT DISTINCT ?unitName ?riverName
+        WHERE
+        {
+            ?r osm:hasName ?riverName;
+               osm:hasFclass "riverbank"^^xsd:string;
+               geo:hasGeometry [ geo:asWKT ?polygonRiver ] .
+
+            ?s ai:hasNAME_1 ?capitalName;
+               ai:hasNAME_3 ?unitName;
+               ai:hasTYPE_3 ?unitType;
+               geo:hasGeometry [ geo:asWKT ?polygonUnit ] .
+
+            FILTER( str(?capitalName)="England"^^xsd:string ) .
+        }
+    } FILTER(strdf:intersects(?polygonRiver, ?polygonUnit) ) .
+
+} GROUP BY ?riverName
+HAVING (?numberOfUnitsCrossed > 1)
+
+------------------------------------------------------------
+(f) Is there any river that crosses at least two countries of the United Kingdom?
+
+SELECT ?riverName ( COUNT(?continentName) as ?numberOfContinentsCrossed )
+WHERE
+{
+    {
+        SELECT ?continentName ?riverName
+        WHERE
+        {
+            ?r osm:hasName ?riverName;
+               osm:hasFclass "riverbank"^^xsd:string;
+               geo:hasGeometry [ geo:asWKT ?polygonRiver ] .
+
+            ?s ai:hasNAME_1 ?continentName;
+               ai:hasCOUNTRY ?countryName;
+               geo:hasGeometry [ geo:asWKT ?polygonUnit ] .
+
+            FILTER( str(?countryName)="United Kingdom"^^xsd:string ) .
+
+            FILTER(geof:sfCrosses(?polygonRiver, strdf:union(?polygonUnit)) ) .
+            #FILTER(strdf:crosses(?polygonRiver, ?polygonUnit) ) .
+        }
+    }
+
+} GROUP BY ?riverName
+HAVING (?numberOfContinentsCrossed > 1)
+
+------------------------------------------------------------
+(g) Which city of Wales has most schools?
+
+SELECT DISTINCT ?unitName ( COUNT(?schoolName) as ?totalSchools )
+WHERE
+{
+    ?s ai:hasNAME_1 ?capitalName;
+       ai:hasTYPE_2 ?unitType;
+       ai:hasNAME_2 ?unitName;
+       geo:hasGeometry [ geo:asWKT ?polygonUnit ] .
+    FILTER( str(?capitalName)="Wales"^^xsd:string && str(?unitName) != "NA"^^xsd:string) .
+
+    ?schools osm:hasFclass "school"^^xsd:string;
+             osm:hasName ?schoolName;
+             geo:hasGeometry [ geo:asWKT ?polygonSchool ] .
+
+    FILTER(geof:sfWithin(?polygonSchool, ?polygonUnit) ) .
+} GROUP BY ?unitName ORDER BY DESC(?totalSchools)
+
+------------------------------------------------------------
+(h) Which district of Northern Ireland has most neighbouring districts?
+SELECT DISTINCT ?sourceName ( COUNT(DISTINCT ?targetName) as ?neighborDistrict )
+WHERE
+{
+    ?a ai:hasNAME_1 "Northern Ireland"^^xsd:string .
+    ?a ai:hasNAME_3 ?sourceName .
+    ?a geo:hasGeometry [ geo:asWKT ?polygon1 ] .
+
+    ?b ai:hasNAME_1 "Northern Ireland"^^xsd:string .
+    ?b ai:hasNAME_3 ?targetName .
+    ?b geo:hasGeometry [ geo:asWKT ?polygon2 ] .
+
+    FILTER( str(?sourceName ) != str(?targetName) )
+    FILTER( geof:sfIntersects(?polygon1, ?polygon2) )
+} GROUP BY ?sourceName ORDER BY DESC(?neighborDistrict) LIMIT 1
+
+------------------------------------------------------------
+(i) Which country has largest area covered by rivers, United Kingdom or Republic of Ireland?
+(threw java.lang.OutOfMemoryError: GC overhead limit exceeded)
+
+SELECT ?continentName ( SUM(strdf:area(?polygonRiver)) AS ?coveredByRiver )
+WHERE
+{
+    ?s ai:hasCOUNTRY ?continentName;
+       geo:hasGeometry [ geo:asWKT ?polygonContinent ] .
+
+    ?r osm:hasName ?riverName;
+       osm:hasFclass "riverbank"^^xsd:string;
+       geo:hasGeometry [ geo:asWKT ?polygonRiver ] .
+
+    FILTER(geof:sfWithin(?polygonRiver, ?polygonContinent) ) .
+
+} GROUP BY ?continentName ORDER BY DESC(?coveredByRiver)
