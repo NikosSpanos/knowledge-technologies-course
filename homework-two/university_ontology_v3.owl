@@ -1,0 +1,455 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/spano/ontologies/2022/11/University#"
+     xml:base="http://www.semanticweb.org/spano/ontologies/2022/11/University"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:University="http://www.semanticweb.org/spano/ontologies/2022/11/University#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University">
+        <owl:versionIRI rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University/1.0.0"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#belongsTo -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#belongsTo">
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRecord"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Property to define the relationship that a Record belongs to only a Student</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#containsCourse -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#containsCourse">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#markedIn"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Property to define the relationship that a Course from the Curriculum is contained in a Record.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#followCourse -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#followCourse">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#isFollowedBy"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Property to define that a Student follows a Course from the Curriculum.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#hasCourse -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasCourse">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Program"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Property to define the relationship between course taught in university programmes (undergraduate, postgraduate)</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRecord -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRecord">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Property to define that a Student has a Record with a marked followed Course</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRegisteredStudents -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRegisteredStudents">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Program"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Property to specify the relationship that a Program has a number of registered Students</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#isFollowedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#isFollowedBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An inverse property of the &quot;followCourse&quot; property to define a relationship that a course from the Curriculum is followed by a Student</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#markedIn -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#markedIn">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The inverse property of the &quot;containsCourse&quot; property to define the relationship that a course is marked in a student&apos;s Record.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#hasMark -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasMark">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+                <owl:withRestrictions rdf:parseType="Collection">
+                    <rdf:Description>
+                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</xsd:minInclusive>
+                    </rdf:Description>
+                    <rdf:Description>
+                        <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</xsd:maxInclusive>
+                    </rdf:Description>
+                </owl:withRestrictions>
+            </rdfs:Datatype>
+        </rdfs:range>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The official registered mark of a Student in a Curriculum Course.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#University"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The courses that are taught in all of university programs (undergraduate, postgraduate).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Courses -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Courses">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#isFollowedBy"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Student"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#markedIn"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses"/>
+        <rdfs:comment xml:lang="en">The course curriculum for the Porsgraduate program</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Programme -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Programme">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Program"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasCourse"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Courses"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRegisteredStudents"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Student"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Programme"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The ποστγραδθατε programme were Postgraduate courses are taught and Postgraduate students are registered.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Student -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Student">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#followCourse"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Courses"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#followCourse"/>
+                        <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:maxQualifiedCardinality>
+                        <owl:onClass rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Student"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The Postgraduate students registered in one of the Postgraduate programmes</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Program -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Program">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#University"/>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The University programmes where a student can register to.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Record -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#University"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#belongsTo"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#containsCourse"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasMark"/>
+                        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:cardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The record of a single student that includes, the student&apos;s name, the followed course and the mark of this course.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Students -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#University"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRecord"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The general concept of all students in the university (from all undergraduate and postgraduate programs).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#isFollowedBy"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#markedIn"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment xml:lang="en">The course curriculum for the Undergraduate program</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Programme -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Programme">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Program"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasCourse"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#hasRegisteredStudents"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Student"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The undergraduate programme were Undergraduate courses are taught and Undergraduate students are registered.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Student -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Student">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#followCourse"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The Undergraduate students registered in one of the Undergraduate programmes</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#University -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#University"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Artificial_Intelligence_I -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Artificial_Intelligence_I">
+        <rdf:type>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Undergraduate_Courses"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdf:type>
+        <isFollowedBy rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Laura"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Artificial_Intelligence_II -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Artificial_Intelligence_II">
+        <rdf:type>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Courses"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdf:type>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Knowledge_Technologies -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Knowledge_Technologies">
+        <rdf:type>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Curriculum"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Postgraduate_Courses"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdf:type>
+        <isFollowedBy rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Mary"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Laura -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Laura">
+        <rdf:type rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <followCourse rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Artificial_Intelligence_I"/>
+        <hasRecord rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#record_1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#Mary -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#Mary">
+        <rdf:type rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Students"/>
+        <followCourse rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Knowledge_Technologies"/>
+        <hasRecord rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#record_2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#record_1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#record_1">
+        <rdf:type rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+        <belongsTo rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Laura"/>
+        <containsCourse rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Artificial_Intelligence_I"/>
+        <hasMark rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</hasMark>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/spano/ontologies/2022/11/University#record_2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/spano/ontologies/2022/11/University#record_2">
+        <rdf:type rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Record"/>
+        <belongsTo rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Mary"/>
+        <containsCourse rdf:resource="http://www.semanticweb.org/spano/ontologies/2022/11/University#Knowledge_Technologies"/>
+        <hasMark rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">9</hasMark>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
