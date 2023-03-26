@@ -1,0 +1,375 @@
+#1 What was the temperature of the stack2 when it was suggested to decrease the temperature?
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem:<http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?stack ?state ?state_mode ?mode ?mitigation_action
+WHERE
+{
+    #The mitegation action per failure mode
+    ?failure_mode rdfs:subClassOf* pemfc:Mode .
+    ?mode a ?failure_mode .
+    ?mitigation_action pemfc:suggestedFor ?mode .
+
+    #mode of stack2
+    ?stack_type rdfs:subClassOf* pemfc:FuelCellStack .
+    ?stack a ?stack_type .
+    ?sensor sosa:isHostedBy ?stack .
+    ?observation sosa:madeBySensor ?sensor .
+    ?state pemfc:describedBy ?observation .
+    ?state pemfc:indicatesMode ?state_mode .
+    FILTER( ?stack = sem:stack2 && ?mode = ?state_mode) #mitigration mode=state mode
+}
+
+#Add a note for this question that temperatures of stack2 operating range is between 0, 100 which indicates condition Normal Mode based on the ontology.
+#Add relevant query example below:
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem:<http://semanticweb.cs.vu.nl/2009/11/sem/>
+PREFIX systems: <http://www.w3.org/ns/ssn/systems/>
+
+SELECT ?operating_range ?condition ?lowValue ?upperValue
+WHERE
+{
+    ?operating_range_instance rdfs:subClassOf* pemfc:OperatingRange .
+    ?operating_range a ?operating_range_instance .
+    ?operating_range systems:inCondition ?condition .
+    ?operating_range pemfc:hasLowerValue ?lowValue .
+    ?operating_range pemfc:hasUpperValue ?upperValue .
+}
+
+----------------------------------------------------------------------------------------------------
+
+#2 In what mode was the system when the temperature of stack1 was more than 35 C?
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?state ?state_mode ?observation ?observation_type ?value
+    WHERE {
+       ?state_type rdfs:subClassOf* pemfc:State .
+       ?state a ?state_type .
+
+       #Each state has a mode/health status
+       ?state pemfc:indicatesMode ?state_mode .
+
+       #An observation is described by a state. Observations measure/monitor specific types.
+       ?state pemfc:describedBy ?observation .
+       ?observation sosa:observedProperty ?observation_type .
+
+       #From each observation type want the temperature types only.
+       FILTER(?observation_type = pemfc:temperature) .
+
+       #Observations have results/outputs.
+       ?observation sosa:hasResult ?output .
+
+       #Observation outputs have values
+       ?output pemfc:hasValue ?value .
+
+       #We want that value to be greater than 35 Celcius degrees
+       FILTER(STR(?value)>"35.0") .
+}
+----------------------------------------------------------------------------------------------------
+
+#3 What properties of the outer anode are measured?
+
+#(Option 1 - executed as sparql query)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?anode ?stack_anode (COALESCE(?property, "no host found") as ?properties) (COALESCE(?measured_property, "no property found") as ?measuredProperty)
+    WHERE {
+        ?anode rdfs:subClassOf* pemfc:Anode .
+        ?stack_anode a ?anode .
+        optional {
+            ?property sosa:isHostedBy ?stack_anode .
+            ?property sosa:observes ?measured_property .
+        }
+}
+
+#(Option 2 - executed as snap sparql query --returns also the current property)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?anode ?stack_anode ?property ?measured_property
+    WHERE {
+        ?anode rdfs:subClassOf pemfc:Anode .
+        ?stack_anode a ?anode .
+        optional {
+            ?property sosa:isHostedBy ?stack_anode .
+            ?property sosa:observes ?measured_property .
+        }
+}
+
+----------------------------------------------------------------------------------------------------
+
+#4 From which sensors is the stoichiometry calculated?
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?sensor
+WHERE
+{
+    pemfc:StoichiometryResult rdfs:subClassOf ?stoichiometry_result .
+    ?stoichiometry_result owl:hasValue ?sensor .
+}
+
+----------------------------------------------------------------------------------------------------
+
+#5 What is the voltage cycle number of stack1?
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?stack ?value
+WHERE
+{
+    ?cellstuck rdfs:subClassOf* pemfc:FuelCellStack .
+    ?stack a ?cellstuck .
+    ?stack pemfc:voltageCycleNumber ?value .
+    FILTER ( ?stack = sem:stack1)
+}
+
+----------------------------------------------------------------------------------------------------
+
+#6. Return all outputs of all sensors
+
+(option 1)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?outputs ?value
+WHERE
+{
+    ?outputs  pemfc:hasValue ?value .
+    FILTER ( ?outputs != pemfc:stoich_result_t1 && ?outputs != pemfc:stoich_result_t2 )
+}
+
+(option 2)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?output_one ?value
+WHERE
+{
+    {
+        ?output_one pemfc:hasValue ?value .
+
+        FILTER EXISTS {
+             ?output_one rdf:type pemfc:RelativeHumiditySensorOutput }
+    }
+
+    UNION {
+        ?output_one pemfc:hasValue ?value .
+
+        FILTER EXISTS {
+            ?output_one rdf:type pemfc:TemperatureSensorOutput }
+    }
+
+    UNION {
+        ?output_one pemfc:hasValue ?value .
+
+        FILTER EXISTS {
+            ?output_one rdf:type sosa:Result }
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+#7 Return the valid outputs of rh_air
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?output_value ?value ?valid
+    WHERE {
+        ?output_humidity rdfs:subClassOf* pemfc:RelativeHumiditySensorOutput .
+        ?output_value a ?output_humidity .
+        ?output_value pemfc:hasValue ?value .
+        ?output_value pemfc:isValid ?valid .
+        FILTER ( str(?valid) = "true" )
+        FILTER ( regex(str(?output_value), "air") )
+}
+
+----------------------------------------------------------------------------------------------------
+
+#8 When did the humidity sensor of the cathode become invalid?
+
+(option 1 --will chose this one)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?sensor ?observation_type ?hosted ?observation ?output ?output_validity ?moment
+    WHERE {
+        ?sensor_type rdfs:subClassOf pemfc:Sensor .
+        ?sensor a ?sensor_type .
+        OPTIONAL { ?sensor sosa:observes ?observation_type . }
+        ?sensor sosa:isHostedBy ?hosted .
+        ?observation sosa:madeBySensor ?sensor .
+        ?observation sosa:hasResult ?output .
+        ?output pemfc:isValid ?output_validity .
+        ?observation pemfc:atTime_inSec ?moment .
+        FILTER ( regex(STR(?observation_type), "Humidity") && regex(STR(?hosted), "cathode") && STR(?output_validity) = "false" )
+}
+
+----------------------------------------------------------------------------------------------------
+
+#9 Which system components were manufactured by fc_company_1?
+
+(option 1)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?system_component ?company
+WHERE
+{
+    ?system_component sem:manufacturedBy ?company .
+    FILTER ( regex(str(?company), "fc_company_1" ) ) .
+}
+
+(option 2 -- more sophisticated query but the same answer)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT * WHERE
+{
+    {
+        SELECT ?system_type ?component_type ?component_manufacturer
+        WHERE
+        {
+            ?system rdfs:subClassOf* pemfc:FuelCellSystem .
+            ?system_type a ?system .
+            ?system_type pemfc:hasPart ?component_type .
+            OPTIONAL {
+                ?component_type sem:manufacturedBy ?component_manufacturer .
+            }
+        }
+    } UNION
+    {
+        SELECT ?system_type ?component_type ?component_manufacturer
+        WHERE
+        {
+            ?system rdfs:subClassOf* pemfc:FuelCellSystem .
+            ?system_type a ?system .
+            ?system_type pemfc:hasPart ?x_type .
+            ?x_type pemfc:hasPart ?component_type .
+            OPTIONAL {
+                ?component_type sem:manufacturedBy ?component_manufacturer .
+            }
+        }
+    } UNION
+    {
+        SELECT ?system_type ?component_type ?component_manufacturer
+        WHERE
+        {
+            ?system rdfs:subClassOf* pemfc:FuelCellSystem .
+            ?system_type a ?system .
+            ?system_type pemfc:hasPart ?x_type .
+            ?component_type sosa:isHostedBy ?x_type .
+            OPTIONAL {
+                ?component_type sem:manufacturedBy ?component_manufacturer .
+            }
+        }
+    }
+    FILTER ( regex(str(?component_manufacturer), "fc_company_1" ) ) .
+} ORDER BY ASC(?component_type)
+
+----------------------------------------------------------------------------------------------------
+
+#10 What was the health state of the system when the relative humidity of the anode of stack1 reached 80?
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX pemfc: <http://www.semanticweb.org/savtr/ontologies/2022/9/PEMFC_DI#>
+PREFIX sem: <http://semanticweb.cs.vu.nl/2009/11/sem/>
+
+SELECT ?state ?health_status ?observation ?measuredbySensor ?output ?value
+    WHERE {
+        ?system_state rdfs:subClassOf* pemfc:State .
+        ?state a ?system_state .
+        ?state pemfc:indicatesMode ?health_status .
+        ?state pemfc:describedBy ?observation .
+        ?observation sosa:madeBySensor ?measuredbySensor .
+        OPTIONAL { ?measuredbySensor sosa:isHostedBy ?host . }
+        ?observation sosa:hasResult ?output .
+        ?output pemfc:hasValue ?value .
+        FILTER ( STR(?value) = "80.0" )
+} ORDER BY ASC(?state)
+
+---------------------------------------------------------------------------------------------------

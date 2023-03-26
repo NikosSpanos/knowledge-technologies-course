@@ -1,0 +1,116 @@
+Query 1: Familiarize with Nikos Kazantakis resource
+
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+SELECT ?musician ?nationality ?deathDate (GROUP_CONCAT(?deathPlaceLabel; separator=", ") AS ?deathPlaceLabels) ?abstract
+
+WHERE
+{
+
+    VALUES ?musician { dbr:Nikos_Kazantzakis }
+
+    ?musician dbo:nationality ?nationality ;
+              dbo:deathDate ?deathDate ;
+              dbo:deathPlace/rdfs:label ?deathPlaceLabel ;
+              dbo:abstract ?abstract .
+
+    FILTER(lang(?abstract) = 'en') .
+    FILTER(lang(?deathPlaceLabel) = 'en') .
+
+} GROUP BY ?musician ?nationality ?deathDate ?abstract
+----------------------------------------------------------------------------------------------------------------
+
+Query 2: Greek wines and their origin
+
+(1st try query)
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+
+SELECT ?pageLink ?wineName (GROUP_CONCAT(?wineRegion; separator=", ") AS ?wineRegions)
+WHERE
+{
+    VALUES ?winePage { dbr:Greek_wine }
+    ?winePage dbo:wikiPageWikiLink ?pageLink .
+    ?pageLink rdfs:label ?wineName .
+    ?pageLink dbo:abstract ?desc .
+    ?pageLink dbo:wikiPageWikiLink ?pageRegion .
+    ?pageRegion rdfs:label ?wineRegion .
+    FILTER EXISTS { ?pageLink rdf:type dbo:Species }
+    FILTER EXISTS { ?pageRegion rdf:type dbo:Location }
+    FILTER ( regex(?desc, "Greek") ) .
+    FILTER ( lang(?wineName) = 'en') .
+    FILTER ( lang(?wineRegion) = 'en' ) .
+} GROUP BY ?pageLink ?winePage ?wineName
+
+(2nd try query)
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+
+SELECT ?winePage ?wineName (GROUP_CONCAT(?wineRegion; separator=", ") AS ?wineRegions)
+WHERE
+{
+    VALUES ?wine { dbc:Grape_varieties_of_Greece }
+    ?wine ^dbo:wikiPageWikiLink ?winePage .
+    ?winePage rdfs:label ?wineName .
+    ?winePage dbo:abstract ?desc .
+    ?winePage dbo:wikiPageWikiLink ?pageLink .
+    ?pageLink rdfs:label ?wineRegion .
+    FILTER EXISTS { ?pageLink rdf:type  dbo:Location }
+    FILTER NOT EXISTS { ?winePage rdf:type  dbo:WineRegion }
+    FILTER ( regex(?desc, "Greek") ) .
+    FILTER ( lang(?wineName) = 'en' ) .
+    FILTER ( lang(?wineRegion) = 'en' ) .
+}
+GROUP BY ?winePage ?wineName
+----------------------------------------------------------------------------------------------------------------
+
+Query 3: Find all the Greek universities known to DBpedia. Output their name, the city that they are located and the number of prime ministers of Greece that have graduated from them (order answers by this number).
+
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+
+SELECT ?universityName (GROUP_CONCAT(?universityCity; separator=", ") AS ?universityCities) COALESCE(?GR_PM_attended,0) AS ?GR_PM_attended
+WHERE
+{
+    VALUES ?universityURI { dbr:List_of_universities_in_Greece }
+    ?universityURI ^dbo:type ?universityPage .
+    ?universityPage dbp:name ?universityName .
+    OPTIONAL { ?universityPage dbp:city/rdfs:label ?universityCity . }
+    FILTER(lang(?universityCity) = 'en') .
+    OPTIONAL {
+        SELECT ?universityPage  (COUNT(?primeMinisterResource) as ?GR_PM_attended)
+        WHERE {
+            VALUES ?primeMinisterURI { dbr:Prime_Minister_of_Greece }
+            ?primeMinisterURI ^dbp:title ?primeMinisterResource .
+            OPTIONAL { ?primeMinisterResource dbo:education ?universityPage }
+            FILTER EXISTS { ?primeMinisterResource rdf:type/rdfs:subClassOf* dbo:Person }
+            FILTER (STRLEN(?universityPage) != 0)
+        }
+        GROUP BY ?universityPage
+    }
+}
+GROUP BY ?universityPage ?universityName ?GR_PM_attended
+ORDER BY DESC(?GR_PM_attended)
+----------------------------------------------------------------------------------------------------------------
+
+Query 4: Validation query to return the Greek Prime Ministers and the education institure they have attended.
+
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+
+SELECT ?universityName ?primeMinisterResource
+WHERE {
+    VALUES ?primeMinisterURI { dbr:Prime_Minister_of_Greece }
+    ?primeMinisterURI ^dbp:title ?primeMinisterResource .
+    OPTIONAL { ?primeMinisterResource dbo:education ?universityName }
+    ?universityName dbo:abstract ?desc .
+    FILTER EXISTS { ?primeMinisterResource rdf:type/rdfs:subClassOf* dbo:Person }
+    FILTER (STRLEN(?universityName) != 0)
+    FILTER ( CONTAINS ( STR (?desc), 'Greece' ) )
+}
