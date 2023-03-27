@@ -11,7 +11,7 @@ Homework two: Exercises utilizing the ALCQO language, tableau techniques, Knowle
 
 Homework three: In this exercise you will use the spatiotemporal RDF store Strabon to store and query you data. Strabon supports both stSPARQL and GeoSPARQL query languages. Data sources: OpenStreetMap and Global Administrative Areas modeled in RDF. 
 
-Author: Spanos Nikolaos (Candidate of the MSc) </br>
+Author: Spanos Nikolaos (Candidate of MSc in Computer Science) </br>
 Supervisor: Professor Manolis Koumparakis
 
 Final grades:
