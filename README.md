@@ -30,6 +30,6 @@ Homework 3: 8.6/10 </br>
   year = {2023},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/NikosSpanos/knowledge-technologies-course}},
+  howpublished = {\url{https://github.com/NikosSpanos/knowledge-technologies-course}}
 }
 ```
