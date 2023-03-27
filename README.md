@@ -19,3 +19,17 @@ Final grades:
 Homework 1: 9.6/10 </br>
 Homework 2: 9.2/10 </br>
 Homework 3: 8.6/10 </br>
+
+
+ins>BibTex template for citations</ins>
+```latex
+@misc{SpanosKnowledgeGraphs2023,
+  author = {Spanos, Nikos},
+  title = {Knowledge Graphs},
+  institution = {University of Athens},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/NikosSpanos/knowledge-graphs-course}},
+}
+```
