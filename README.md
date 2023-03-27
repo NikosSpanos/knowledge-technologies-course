@@ -21,7 +21,7 @@ Homework 2: 9.2/10 </br>
 Homework 3: 8.6/10 </br>
 
 
-ins>BibTex template for citations</ins>
+<ins>BibTex template for citations</ins>
 ```latex
 @misc{SpanosKnowledgeTechnologies2023,
   author = {Spanos, Nikos},
